@@ -2,7 +2,9 @@
 title: "Creating Graphs in R with 'ggplot'"
 author: "Paige Becker"
 date: "7/20/2020"
-output: html_document
+output: 
+  github_document:
+    toc: true
 ---
 
 # Plots with ggplot2
