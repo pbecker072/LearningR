@@ -9,3 +9,19 @@ output:
 
 # Plots with ggplot2
 We are going to make plots in R and it's going to be amazing.
+
+#### Load packages
+##### library(tidyverse)
+
+## Basic format of a ggplot command
+ggplot(data = <DATA>) + 
+  <GEOM_FUNCTION>(
+     mapping = aes(<MAPPINGS>),
+     stat = <STAT>, 
+     position = <POSITION>
+  ) +
+  <COORDINATE_FUNCTION> +
+  <FACET_FUNCTION> +
+  <THEME_FUNCTION>
+
+  
