@@ -156,6 +156,82 @@ coronavirus_ttd %>%
 
 coronavirus_ttd %>%
   mutate(unknown_outcome = confirmed-death-recovered/ confirmed) %>% 
-  filter(confirmed < 20000)  
+  filter(confirmed < 20000)   
 
 
+
+# arrange() orders rows  
+## We may want to rearrange countries in acending order for the proportion of unknown cases  
+
+coronavirus_ttd %>%
+  mutate(unknown_outcome = (confirmed - death - recovered)/confirmed) %>% 
+  filter(confirmed > 20000) %>% 
+  arrange(unknown_outcome)
+
+### How many countries have suffered more than 3,000 deaths so far and which three countries have the highes recorded death counts?  
+
+coronavirus_ttd %>%
+  filter(death > 3000) %>% 
+  arrange(-death)  
+  
+### When and where was the highest death count observed? (Go back to orginal dataset)  
+
+coronavirus %>% 
+  filter(type == "death") %>% 
+  arrange(-cases)  
+
+### Identify the first recorded case in Denmark  
+
+coronavirus %>% 
+  filter(Country.Region == "Denmark", cases > 0) %>% 
+  arrange(date)  
+  
+
+# Grouped summaries with summarize() and group_by()  
+### Collapses a data frame to a single row  
+
+## Calculate the total number of confirmed cases detected globally since 1-20-2020  
+coronavirus %>% 
+  filter(type == "confirmed") %>% 
+  summarize(sum= sum(cases))  
+  
+## Use group_by to calculate the total number of confirmed cases by region  
+
+coronavirus %>% 
+  filter(type == "confirmed") %>%
+  group_by(Country.Region) %>% 
+  summarize(total_cases = sum(cases))  
+
+## We can also summarize() to check how many observations (dates) we have for each country  
+
+coronavirus %>% 
+  filter(type == "confirmed") %>%
+  group_by(Country.Region) %>% 
+  summarize(n = n())  
+  
+## We can do mutli-level grouping. How many each type of case there were globally on a Monday, we chain these functions together:  
+
+coronavirus %>% 
+  group_by(date, type) %>% 
+  summarize(total = sum(cases)) %>%  # sums the count across countries
+  filter(date == "2020-04-06")  
+  
+## Which day had the highest total death count globally so far?
+
+coronavirus %>% 
+  filter(type == "death") %>% 
+  group_by(date) %>% 
+  summarize(total_cases = sum(cases)) %>% 
+  arrange(-total_cases)  
+
+# Optional question  
+## How many countries already have more than 1000 deaths in April?
+
+library(lubridate)  
+
+coronavirus %>% 
+  mutate(month= month(date)) %>% 
+  filter( type == "death", month == 4) %>% 
+  group_by(Country.Region) %>% 
+  summarize(total_death = sum(cases)) %>% 
+  filter(total_death > 1000)  
