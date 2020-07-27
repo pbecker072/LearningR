@@ -90,5 +90,72 @@ sum(x$cases)
 select(coronavirus, date, Country.Region, type, cases)  
 
 ## can also use - to deselect columns
-select(coronavirus, -Lat, -Long) # you can use - to deselect columns  
+select(coronavirus, -Lat, -Long) # you can use - to deselect columns   
+
+
+
+# Use select() and filter() together
+#### Combine and filter data to retain only records for the US and remove the Lat, Long and Province.State columns. We will save this as a subsetted variable  
+
+coronavirus_us  <- filter(coronavirus, Country.Region == "US")  
+coronavirus_us2 <- select(coronavirus_us, -Lat, -Long, -Province.State)  
+
+
+# Pipe operator %>% 
+##### Equivalent to head(coronavirus)  
+
+coronavirus %>% head()  
+
+##### Can still specify other arguments to this function  
+###### First 3 rows of data
+
+coronavirus %>% head(3)
+
+## Think "and then" when you see %>%   
+
+### instead of this...  
+coronavirus_us  <- filter(coronavirus, Country.Region == "US")  
+coronavirus_us2 <- select(coronavirus_us, -Lat, -Long, -Province.State)   
+### ...we can do this  
+coronavirus_us  <- coronavirus %>% filter(Country.Region == "US")  
+coronavirus_us2 <- coronavirus_us %>% select(-Lat, -Long, -Province.State)
+
+## We can use the pipe to chain these 2 operations together  
+
+coronavirus_us  <- coronavirus %>% 
+  filter(Country.Region == "US") %>%
+  select(-Lat, -Long, -Province.State)     
+  
+# mutate() adds new variables
+### Useful to add new columns that are functions of existing columns
+
+## Rearranging the data set to make it easier to mutate  
+
+coronavirus_ttd <- coronavirus %>% 
+  select(country = Country.Region, type, cases) %>%
+  group_by(country, type) %>%
+  summarise(total_cases = sum(cases)) %>%
+  pivot_wider(names_from = type,
+              values_from = total_cases) %>%
+  arrange(-confirmed)
+  
+## Let's have a look at the structure of that new rearranged dataset  
+coronavirus_ttd  
+
+
+## Comparing the total death count to confirmed cases by country by dividing death/confirmed  
+
+coronavirus_ttd %>%
+  mutate(deathrate = death / confirmed)   
+
+#### We can modify the mutate equation in many ways. For example, if we want to adjust the number of significant digits printed, we can type:  
+coronavirus_ttd %>%
+  mutate(deathrate = round(death / confirmed, 2))  
+  
+## Create a new variavble that shows proportion of confirmed cases for which the outcome is unknown  
+
+coronavirus_ttd %>%
+  mutate(unknown_outcome = confirmed-death-recovered/ confirmed) %>% 
+  filter(confirmed < 20000)  
+
 
